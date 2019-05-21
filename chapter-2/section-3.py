@@ -34,6 +34,45 @@ def naive_add_matrix_and_vector(x, y):
     return x
 
 
+def naive_vector_dot(x, y):
+    # A naive implementation of dot product for two vectors.
+    assert len(x.shape) == 1
+    assert len(y.shape) == 1
+    assert x.shape[0] == y.shape[0]
+
+    z = 0
+    for i in range(x.shape[0]):
+        z += x[i] * y[i]
+    return z
+
+
+def naive_matrix_vector_dot(x, y):
+    # A naive implementation of dot product between a matrix and a vector.
+    assert len(x.shape) == 2
+    assert len(y.shape) == 1
+    assert x.shape[1] == y.shape[0]
+
+    z = np.zeros(x.shape[0])
+    for i in range(x.shape[0]):
+        for j in range(x.shape[1]):
+            z[i] += x[i, j] * y[j]
+    return z
+
+
+def naive_matrix_dot(x, y):
+    # A naive implementation of dot product between a matrix and a vector.
+    assert len(x.shape) == 2
+    assert len(y.shape) == 2
+    assert x.shape[1] == y.shape[0]
+
+    z = np.zeros((x.shape[0], y.shape[1]))
+    for i in range(x.shape[0]):
+        for j in range(y.shape[1]):
+            row_x = x[i, :]
+            column_y = y[:, j]
+            z[i, j] = naive_vector_dot(row_x, column_y)
+    return z
+
 # Test naive relu
 import numpy as np
 a = np.array([[1,  2, 3,  4],
@@ -57,3 +96,33 @@ a = np.random.random((64, 3, 32, 10))
 b = np.random.random((32, 10))
 c = np.maximum(a, b)
 print(f"c = np.maximum(a, b)\na.shape = {a.shape}\nb.shape = {b.shape}\nc.shape = {c.shape}\n")
+
+# 2.3.3
+# Dot product
+a = np.random.random(5)
+b = np.random.random(5)
+print(f"c = naive_vector_dot(a, b)\na = {a}\nb = {b}\nc = {naive_vector_dot(a, b)}\n")
+print(f"c = np.dot(a, b)\na = {a}\nb = {b}\nc = {np.dot(a, b)}\n")
+
+a = np.random.random((3, 2))
+b = np.random.random(2)
+print(f"c = naive_matrix_vector_dot(a, b)\na = {a}\nb = {b}\nc = {naive_matrix_vector_dot(a, b)}\n")
+print(f"c = np.dot(a, b)\na = {a}\nb = {b}\nc = {np.dot(a, b)}\n")
+
+a = np.random.random((3, 2))
+b = np.random.random((2, 3))
+print(f"c = naive_matrix_dot(a, b)\na = {a}\nb = {b}\nc = {naive_matrix_dot(a, b)}\n")
+print(f"c = np.dot(a, b)\na = {a}\nb = {b}\nc = {np.dot(a, b)}\n")
+
+# 2.3.4
+# Reshaping
+a = np.array([[0, 1],
+              [2, 3],
+              [4, 5]])
+print(f"a = {a}\na.reshape((6,1)) = {a.reshape((6,1))}")
+print(f"a = {a}\na.reshape((2,3)) = {a.reshape((2,3))}")
+
+# Transposition
+print(f"a = {a}\na.reshape((6,1)) = {a.transpose()}")
+
+
