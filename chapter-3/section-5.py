@@ -85,6 +85,11 @@ one_hot_test_labels = to_one_hot(test_labels)
 from keras import models
 from keras import layers
 # Construct model.
+# SETUP: adding a information bottleneck(4 units) in second layer lowers accuracy to 68.5%
+# SETUP: 32 hidden units lowered accuracy to 76%: investigate further
+# SETUP: 128 hidden units incresed accuracy to 78.81%: possibly justified
+# SETUP: three hidden layer didnt improve results: 76.63%
+# SETUP: one hidden layer improved accuracy: 79.43%
 model = models.Sequential()
 model.add(layers.Dense(64, activation='relu', input_shape=(10000,)))
 model.add(layers.Dense(64, activation='relu'))
@@ -105,7 +110,7 @@ history = model.fit(partial_x_train, partial_y_train,
                     batch_size=512,
                     epochs=9,
                     validation_data=(x_val, y_val))
-
+plot_history(history)
 # Output results.
 results_test = model.evaluate(x_test, one_hot_test_labels)
 results_train = model.evaluate(partial_x_train, partial_y_train)
