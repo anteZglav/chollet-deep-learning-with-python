@@ -47,6 +47,7 @@ from keras.layers import Dense
 model = Sequential()
 model.add(Dense(16, activation='relu', input_shape=(int(1e4),)))
 model.add(Dense(16, activation='relu'))
+model.add(Dense(16, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 from keras import optimizers
@@ -81,7 +82,6 @@ index = np.random.randint(0, x_test.shape[0])
 prediction = model.predict(x_test[index].reshape((-1,int(1e4))))[0][0]
 print(f" Model predicted {'positive' if prediction>0.5 else 'negative'} ({prediction*100:.2f}%)for x_test[{index}] "
       f"when true sentiment was {'positive' if y_test[index] else 'negative'}.")
-
 # Plot history.
 import matplotlib.pyplot as plt
 
