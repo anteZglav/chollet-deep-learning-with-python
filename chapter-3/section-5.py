@@ -76,6 +76,11 @@ one_hot_test_labels = to_one_hot(test_labels)
 # from keras.utils import to_categorical
 # one_hot_train_labels = to_categorical(train_labels)
 # one_hot_test_labels = to_categorical(test_labels)
+# 3.5.6
+# Try different label encoding. NOTE: also change loss to sparse_categorical_crossentropy.
+# Produces same results.
+# y_train = np.array(train_labels)
+# y_test = np.array(test_labels)
 
 from keras import models
 from keras import layers
