@@ -1,6 +1,7 @@
 from keras.datasets import reuters
 import numpy as np
 import textwrap
+from matplotlib import pyplot as plt
 
 # 3.5.1
 # Classify reuters newswires. A single-label multiclass classification problem.
@@ -25,6 +26,38 @@ def vectorize_sequences(sequences, dimension=10000):
     for i,sequence in enumerate(sequences):
         results[i,sequence] = 1.
     return results
+
+
+def plot_history(history_in):
+    # Plot loss.
+    loss = history_in.history['loss']
+    val_loss = history_in.history['val_loss']
+
+    epochs = range(1, len(loss) + 1)
+    plt.figure(1)
+    plt.clf()
+    plt.subplot(2, 1, 1)
+    plt.subplots_adjust(hspace=0.5)
+    plt.plot(epochs, loss,      'bo',   label='Training loss')
+    plt.plot(epochs, val_loss,  'b',    label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.show()
+
+    # Plot accuracy.
+    acc = history_in.history['acc']
+    val_acc = history_in.history['val_acc']
+
+    plt.subplot(2, 1, 2,)
+    plt.plot(epochs, acc,      'bo',   label='Training accuracy')
+    plt.plot(epochs, val_acc,  'b',    label='Validation accuracy')
+    plt.title('Training and validation accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.show()
 
 
 x_train = vectorize_sequences(train_data)
@@ -62,36 +95,37 @@ partial_x_train = x_train[1000:]
 y_val = one_hot_train_labels[:1000]
 partial_y_train = one_hot_train_labels[1000:]
 
+# SETUP: overfitting at 9 epochs
 history = model.fit(partial_x_train, partial_y_train,
                     batch_size=512,
-                    epochs=20,
-                    validation_data=(x_val,y_val))
+                    epochs=9,
+                    validation_data=(x_val, y_val))
 
-from matplotlib import pyplot as plt
+# Output results.
+results_test = model.evaluate(x_test, one_hot_test_labels)
+results_train = model.evaluate(partial_x_train, partial_y_train)
+results_validate = model.evaluate(x_val, y_val)
 
-# Plot loss.
-loss = history.history['loss']
-val_loss = history.history['val_loss']
+print(f"This network achieved training accuracy of {results_train[1]*100:.2f}% with loss {results_train[0]}")
+print(f"This network achieved validation accuracy of {results_validate[1]*100:.2f}% with loss {results_validate[0]}")
+print(f"This network achieved test accuracy of {results_test[1]*100:.2f}% with loss {results_test[0]}")
+# This network achieved 76.71% accuracy.
 
-epochs = range(1, len(loss) + 1)
-plt.figure()
-plt.plot(epochs, loss,      'bo',   label='Training loss')
-plt.plot(epochs, val_loss,  'b',    label='Validation loss')
-plt.title('Training and validation loss')
-plt.xlabel('Epochs')
-plt.ylabel('Loss')
-plt.legend()
-plt.show()
+# Compare network to random baseline.
+# Pretty sure this is incorrect in the book because we are supposing that all the labels are equally present.
+import copy
+test_labels_copy = copy.copy(test_labels)
+np.random.shuffle(test_labels_copy)
+hits_array = np.array(test_labels) == np.array(test_labels_copy)
+print(f"Random approach would produce {float(np.sum(hits_array)) / len(test_labels) * 100:.2f} % accuracy.")
 
-# Plot accuracy.
-acc = history.history['acc']
-val_acc = history.history['val_acc']
+# Test prediction.
+predictions = model.predict(x_test)
+print(f"For each sample we have {predictions.shape[1]} predictions.")
+index = np.random.randint(0, predictions.shape[0])
+with np.printoptions(precision=2, suppress=True):
+    print(f"For sample {index} the network "
+          f"{'correctly' if np.argmax(predictions[index]) == np.argmax(one_hot_test_labels[index]) else 'falsely'} "
+          f"predicts these probabilities"
+          f"(maximum likelihood index:{np.argmax(predictions[index])}):\n{predictions[index] * 100}")
 
-plt.figure()
-plt.plot(epochs, acc,      'bo',   label='Training accuracy')
-plt.plot(epochs, val_acc,  'b',    label='Validation accuracy')
-plt.title('Training and validation accuracy')
-plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
