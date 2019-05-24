@@ -44,14 +44,16 @@ from keras.models import Sequential
 from keras.layers import Dense
 
 # Two dense hidden layers with relu activation followed by a single sigmoid output layer to generate probabilities.
+# TESTED: one extra layer: no improvement
+# TESTED: one 32 and 64 neurons: no improvement
+# TESTED: tanh activation: significantly worse accuracy
 model = Sequential()
 model.add(Dense(16, activation='relu', input_shape=(int(1e4),)))
 model.add(Dense(16, activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
+model.add(Dense(1, activation='relu'))
 
 from keras import optimizers
-
+# TESTED: mse: no improvement in accuracy with lower loss - probably a worse criterion.
 model.compile(optimizer=optimizers.RMSprop(lr=1e-3),
               loss='binary_crossentropy',
               metrics=['accuracy'])
